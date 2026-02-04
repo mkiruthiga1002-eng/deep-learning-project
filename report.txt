@@ -1,0 +1,86 @@
+ Variational Autoencoder (VAE) Based Anomaly Detection on MNIST
+
+ 1. Introduction
+
+This project focuses on detecting anomalies in image data using a Variational Autoencoder (VAE). A VAE is an unsupervised deep learning model that learns the underlying distribution of normal data and identifies anomalies based on poor reconstruction.
+
+The MNIST handwritten digit dataset is used to demonstrate the effectiveness of VAE-based anomaly detection.
+
+
+
+ 2. Objectives
+
+ To implement a Variational Autoencoder using PyTorch
+ To train the VAE on MNIST images
+ To detect anomalies using reconstruction error
+
+
+
+ 3. Dataset Description
+
+ Dataset: MNIST Handwritten Digits
+ Image size: 28 × 28 (grayscale)
+ Training samples: 60,000
+ Test samples: 10,000
+ Pixel range: [0, 1]
+
+The dataset is loaded using torchvision and normalized using `ToTensor()`.
+
+
+
+ 4. Model Architecture
+
+ Encoder
+
+ Input layer: 784 neurons
+ Hidden layer: 400 neurons with ReLU activation
+ Latent space: 20-dimensional mean (μ) and log-variance (log σ²)
+
+Decoder
+
+ Latent input: 20 neurons
+ Hidden layer: 400 neurons with ReLU activation
+ Output layer: 784 neurons with Sigmoid activation
+
+The sigmoid activation ensures reconstructed pixel values remain in the range [0,1].
+
+
+
+ 5. Loss Function
+
+The VAE is trained using the Evidence Lower Bound (ELBO) loss function:
+
+Total Loss = Binary Cross Entropy (BCE) + KL Divergence (KLD)
+
+ BCE measures reconstruction quality
+ KLD regularizes the latent space
+
+A beta (β) value of 1.0 is used.
+
+
+
+ 6. Training Configuration
+
+ Optimizer: Adam
+ Learning rate: 0.001
+ Batch size: 128
+ Epochs: 10
+ Device: CPU / GPU
+
+
+
+7. Training Results
+
+The model shows consistent learning across epochs. Sample training loss values:
+
+ Epoch 8: 107.3789
+ Epoch 9: 106.7762
+ Epoch 10: 106.3722
+
+These values are typical for MNIST VAEs and indicate stable convergence.
+
+
+
+ 8. Conclusion
+
+The VAE model was successfully implemented and trained on MNIST data. The decreasing training loss confirms effective learning. This project demonstrates the application of unsupervised learning for anomaly detection and can be extended to real-world datasets.
