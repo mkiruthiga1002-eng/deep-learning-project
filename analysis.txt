@@ -1,83 +1,110 @@
- Result Analysis: VAE-Based Anomaly Detection
+ Result Analysis: β-VAE Based Anomaly Detection on MNIST
 
- 1. Overview
+ 1. Overview of Results
 
-This analysis evaluates the performance of the Variational Autoencoder trained on the MNIST dataset, focusing on training behavior, reconstruction error, and anomaly detection outcomes.
+This section provides a detailed analysis of the experimental results obtained from the β-VAE anomaly detection model trained on the MNIST dataset. The model was trained exclusively on digit 1, treating all other digits as anomalies during testing.
+
+Two configurations were evaluated:
+
+ β = 1.0 (Standard VAE)
+ β = 2.0 (Stronger KL regularization)
 
 
 
- 2. Training Loss Analysis
+ 2. Training Loss Behaviour
 
-The observed average training loss per image after 10 epochs is approximately 106.
+ Observed Training Loss
+
+ For β = 1.0, the loss reduced from **177.69** to **56.65**
+ For β = 2.0, the loss reduced from **182.83** to **62.06**
 
  Interpretation
 
- The loss includes BCE summed over 784 pixels
- KL divergence adds latent regularization
- Loss values between 90 and 120 are standard for MNIST VAEs
-
-The steady decrease in loss indicates successful optimization.
+ The steady decrease in loss indicates stable and successful training
+ Higher loss values for β = 2.0 are expected due to stronger KL regularization
+ β = 1.0 achieves better reconstruction quality, while β = 2.0 enforces a more structured latent space
 
 
 
- 3. Reconstruction Error Analysis
+ 3. Precision Analysis
 
-Anomaly detection is based on Mean Squared Error (MSE) between original and reconstructed images.
+ Observed Value
 
- MSE values are small because pixel values lie in [0,1]
- Averaging across pixels further reduces the numerical scale
+ Precision = 1.000 for both β values
 
-Observed threshold:
+ Interpretation
 
- Threshold (99th percentile): 0.03124
-
-This threshold correctly separates the highest reconstruction errors.
-
-
-
- 4. Anomaly Detection Results
-
- Total test samples: 10,000
- Percentile used: 99%
- Detected anomalies: 100
-
- Explanation
-
-Since MNIST contains only valid digit images, true anomalies do not exist. The detected samples correspond to:
-
- Unclear or distorted handwriting
- Rare digit styles
- Low-quality reconstructions
-
-The anomaly count exactly matches the expected 1% cutoff, confirming correct implementation.
+ A precision of 1.0 means all samples classified as anomalies are truly anomalous
+ The model is highly conservative and avoids false positives
+ This behaviour is desirable in safety-critical anomaly detection systems
 
 
 
- 5. Model Behavior Insights
+ 4. Recall Analysis
 
- The VAE learns a compact latent representation
- Common digit structures are reconstructed accurately
- Rare patterns produce higher reconstruction error
+ Observed Value
 
+ Recall = 0.011 for both β values
 
+ Interpretation
 
- 6. Limitations
+ Low recall indicates that only a small fraction of anomalies are detected
+ This occurs because the anomaly threshold is set at the 99th percentile
+ Only the most extreme reconstruction errors are flagged as anomalies
 
- No real anomalies in MNIST
- Threshold-based detection is relative
- Performance depends on training data distribution
-
-
-
- 7. Recommendations
-
- Train using only one digit class for true anomaly detection
- Increase training epochs for better reconstruction
- Use β-VAE for stronger latent regularization
- Visualize anomalous samples for qualitative evaluation
+This trade-off intentionally favors precision over recall.
 
 
 
-8. Final Remarks
+ 5. ROC-AUC Analysis
 
-The results confirm that the VAE functions as expected for anomaly detection. While MNIST limits anomaly realism, the experiment effectively demonstrates reconstruction-based anomaly scoring and thresholding principles.
+ Observed Value
+
+ AUC ≈ 0.999 for both β values
+
+ Interpretation
+
+ A near-perfect AUC indicates excellent separation between normal and anomalous samples
+ Even though recall is low at the chosen threshold, the overall ranking of anomaly scores is highly accurate
+ This suggests that adjusting the threshold can significantly improve recall
+
+
+
+ 6. Comparison Between β = 1.0 and β = 2.0
+
+ Aspect                  β = 1.0   β = 2.0        
+  
+ Reconstruction Quality  Better    Slightly worse 
+ Latent Regularization   Moderate  Strong         
+ Loss Value              Lower     Higher         
+ Precision               1.000     1.000          
+ Recall                  0.011     0.011          
+ AUC                     0.999     0.999          
+
+ Key Insight
+
+In this experiment, increasing β did not significantly change anomaly detection performance because the digit class (1) is visually distinct from other digits in MNIST.
+
+
+
+ 7. Limitations of the Experiment
+
+ MNIST does not contain real-world anomalies
+ Anomalies were synthetically defined using class labels
+ Fully connected architecture limits spatial feature learning
+ Fixed percentile threshold restricts recall
+
+
+
+ 8. Recommendations for Improvement
+
+ Use convolutional VAE (Conv-VAE) for better image representation
+ Experiment with lower percentile thresholds (e.g., 95%) to improve recall
+ Apply the method to more complex datasets such as EMNIST or industrial defect data
+ Perform latent space visualization to analyze feature disentanglement
+
+
+
+9. Final Conclusion
+
+The β-VAE model demonstrates strong anomaly detection capability on MNIST, achieving perfect precision and near-perfect AUC. Although recall is low due to strict thresholding, the results confirm that reconstruction error is a reliable indicator of abnormality. The experiment successfully validates β-VAE as an effective unsupervised anomaly detection approach.

@@ -1,86 +1,75 @@
- Variational Autoencoder (VAE) Based Anomaly Detection on MNIST
+ Project Report: β-VAE Based Anomaly Detection on MNIST
 
- 1. Introduction
+ 1. Objective
 
-This project focuses on detecting anomalies in image data using a Variational Autoencoder (VAE). A VAE is an unsupervised deep learning model that learns the underlying distribution of normal data and identifies anomalies based on poor reconstruction.
+The objective of this project is to detect anomalies in handwritten digit images using a Variational Autoencoder (VAE). The model is trained only on a single normal class (digit 1) and tested on the full MNIST dataset. Digits other than 1 are treated as anomalies.
 
-The MNIST handwritten digit dataset is used to demonstrate the effectiveness of VAE-based anomaly detection.
+ 2. Dataset Description
 
+ Dataset: MNIST handwritten digits
+ Image size: 28 × 28 grayscale
+ Training data: Only digit 1
+ Test data: All digits (0–9)
+ Normal class: Digit 1
+ Anomalies: Digits 0, 2–9
 
+ 3. Model Architecture
 
- 2. Objectives
+A fully connected β-VAE is used:
 
- To implement a Variational Autoencoder using PyTorch
- To train the VAE on MNIST images
- To detect anomalies using reconstruction error
+ Encoder: 784 → 400 → latent space (20 dimensions)
+ Latent variables: Mean (μ) and Log-Variance (logσ²)
+ Decoder: 20 → 400 → 784
+ Activation: ReLU (hidden layers), Sigmoid (output layer)
 
+ 4. Loss Function
 
+The loss function is the Evidence Lower Bound (ELBO):
 
- 3. Dataset Description
+ Reconstruction Loss: Binary Cross Entropy (BCE)
+ Regularization Term: KL Divergence
+ Total Loss = BCE + β × KL Divergence
 
- Dataset: MNIST Handwritten Digits
- Image size: 28 × 28 (grayscale)
- Training samples: 60,000
- Test samples: 10,000
- Pixel range: [0, 1]
+Two β values were tested:
 
-The dataset is loaded using torchvision and normalized using `ToTensor()`.
+ β = 1.0 (Standard VAE)
+ β = 2.0 (Stronger regularization)
 
-
-
- 4. Model Architecture
-
- Encoder
-
- Input layer: 784 neurons
- Hidden layer: 400 neurons with ReLU activation
- Latent space: 20-dimensional mean (μ) and log-variance (log σ²)
-
-Decoder
-
- Latent input: 20 neurons
- Hidden layer: 400 neurons with ReLU activation
- Output layer: 784 neurons with Sigmoid activation
-
-The sigmoid activation ensures reconstructed pixel values remain in the range [0,1].
-
-
-
- 5. Loss Function
-
-The VAE is trained using the Evidence Lower Bound (ELBO) loss function:
-
-Total Loss = Binary Cross Entropy (BCE) + KL Divergence (KLD)
-
- BCE measures reconstruction quality
- KLD regularizes the latent space
-
-A beta (β) value of 1.0 is used.
-
-
-
- 6. Training Configuration
+ 5. Training Setup
 
  Optimizer: Adam
- Learning rate: 0.001
- Batch size: 128
+ Learning Rate: 0.001
+ Batch Size: 128
  Epochs: 10
- Device: CPU / GPU
+ Device: CPU / GPU (if available)
+
+ 6. Anomaly Detection Method
+
+ Reconstruction error is computed using Mean Squared Error (MSE)
+ A threshold is defined at the 99th percentile of reconstruction error
+ Samples above the threshold are classified as anomalies
+
+ 7. Evaluation Metrics
+
+ Precision
+ Recall
+ ROC-AUC
+
+8. Final Results
+
+ β Value:1.0
+ Precision:1.000
+ Recall:0.011
+ AUC:0.999
+
+ β Value:2.0
+ Precision:1.000
+ Recall:0.011
+ AUC:0.999
+  
 
 
 
-7. Training Results
+ 9. Summary
 
-The model shows consistent learning across epochs. Sample training loss values:
-
- Epoch 8: 107.3789
- Epoch 9: 106.7762
- Epoch 10: 106.3722
-
-These values are typical for MNIST VAEs and indicate stable convergence.
-
-
-
- 8. Conclusion
-
-The VAE model was successfully implemented and trained on MNIST data. The decreasing training loss confirms effective learning. This project demonstrates the application of unsupervised learning for anomaly detection and can be extended to real-world datasets.
+The β-VAE model successfully separates normal and anomalous samples based on reconstruction error. Both β values show excellent discrimination ability as reflected by the high AUC score.
